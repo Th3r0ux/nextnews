@@ -937,6 +937,10 @@ function getScoreColor(score) {
   return `hsl(${hue}, 75%, 55%)`;
 }
 
+    function toPercent(value, max) {
+  return Math.round((value / max) * 100);
+}
+
     function renderCard(item){
       return `
         <article class="card ${state.selectedId === item.id ? 'active' : ''}" data-id="${item.id}">
@@ -954,10 +958,10 @@ function getScoreColor(score) {
             <span class="badge">${item.status}</span>
           </div>
           <div class="mini-grid">
-            <div class="mini"><label>Impact</label><strong>${item.impact}</strong></div>
-            <div class="mini"><label>Utilité</label><strong>${item.utility}</strong></div>
-            <div class="mini"><label>Réactif</label><strong>${item.react}</strong></div>
-            <div class="mini"><label>Originalité</label><strong>${item.originality}</strong></div>
+            <div class="mini"><label>Impact</label><strong>${toPercent(item.impact, 25)}%</strong></div>
+<div class="mini"><label>Utilité</label><strong>${toPercent(item.utility, 25)}%</strong></div>
+<div class="mini"><label>Réactif</label><strong>${toPercent(item.react, 20)}%</strong></div>
+<div class="mini"><label>Originalité</label><strong>${toPercent(item.originality, 5)}%</strong></div>
           </div>
           <div class="angle"><strong>Angle :</strong> ${item.angleMain}</div>
           <div class="actions">
@@ -974,7 +978,13 @@ function getScoreColor(score) {
         <div class="all-topics-row all-topic-item ${state.selectedId === item.id ? 'active' : ''}" data-id="${item.id}">
           <div class="topic-name">${item.title}</div>
           <div class="topic-subscores">
-            Impact ${item.impact} · Utilité ${item.utility} · Réactif ${item.react} · Portée ${item.reach} · Proximité ${item.proximity} · Viralité ${item.virality} · Originalité ${item.originality}
+            Impact ${toPercent(item.impact, 25)}% ·
+Utilité ${toPercent(item.utility, 25)}% ·
+Réactif ${toPercent(item.react, 20)}% ·
+Portée ${toPercent(item.reach, 15)}% ·
+Proximité ${toPercent(item.proximity, 5)}% ·
+Viralité ${toPercent(item.virality, 5)}% ·
+Originalité ${toPercent(item.originality, 5)}%
           </div>
           <div class="topic-total" style="color:${getScoreColor(item.total)};">
   ${item.total}
@@ -1004,13 +1014,13 @@ function getScoreColor(score) {
         <div class="panel">
           <h4>Détail du score</h4>
           <div class="score-list">
-            <div class="row"><span>Impact sur les gens</span><strong>${item.impact}/25</strong></div>
-            <div class="row"><span>Potentiel d'utilité</span><strong>${item.utility}/25</strong></div>
-            <div class="row"><span>Potentiel réactif</span><strong>${item.react}/20</strong></div>
-            <div class="row"><span>Portée</span><strong>${item.reach}/15</strong></div>
-            <div class="row"><span>Proximité</span><strong>${item.proximity}/5</strong></div>
-            <div class="row"><span>Viralité</span><strong>${item.virality}/5</strong></div>
-            <div class="row"><span>Originalité</span><strong>${item.originality}/5</strong></div>
+            <div class="row"><span>Impact sur les gens</span><strong>${toPercent(item.impact, 25)}%</strong></div>
+<div class="row"><span>Potentiel d'utilité</span><strong>${toPercent(item.utility, 25)}%</strong></div>
+<div class="row"><span>Potentiel réactif</span><strong>${toPercent(item.react, 20)}%</strong></div>
+<div class="row"><span>Portée</span><strong>${toPercent(item.reach, 15)}%</strong></div>
+<div class="row"><span>Proximité</span><strong>${toPercent(item.proximity, 5)}%</strong></div>
+<div class="row"><span>Viralité</span><strong>${toPercent(item.virality, 5)}%</strong></div>
+<div class="row"><span>Originalité</span><strong>${toPercent(item.originality, 5)}%</strong></div>
           </div>
         </div>
 
