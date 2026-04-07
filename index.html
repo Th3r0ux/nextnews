@@ -560,7 +560,7 @@
 
     <div class="filters-actions">
       <button id="resetFiltersBtn" class="btn" type="button">Réinitialiser</button>
-      <button id="closeFiltersBtn" class="btn" type="button">OK</button>
+      <button id="closeFiltersBtn" class="btn" type="button">Fermer</button>
     </div>
   </div>
 </div>
@@ -737,7 +737,7 @@
   sortFilter: document.getElementById('sortFilter'),
   filtersPanel: document.getElementById('filtersPanel'),
   toggleFiltersBtn: document.getElementById('toggleFiltersBtn'),
-  applyFiltersBtn: document.getElementById('applyFiltersBtn'),
+  closeFiltersBtn: document.getElementById('closeFiltersBtn'),
   resetFiltersBtn: document.getElementById('resetFiltersBtn'),
   activeFilters: document.getElementById('activeFilters')
 };
@@ -801,7 +801,8 @@ function resetFilters(){
   els.scoreFilter.value = String(state.score);
   els.sortFilter.value = state.sort;
 
-  toggleFilters(false);
+  toggleFilters(false); // 👈 ajoute ça
+
   render();
 }
 
@@ -1014,24 +1015,27 @@ function renderActiveFilters(){
       state.search = e.target.value;
       render();
     });
-
-    els.regionFilter.addEventListener('change', e => {
+   els.regionFilter.addEventListener('change', e => {
   state.region = e.target.value;
+  toggleFilters(false);
   render();
 });
 
 els.timeFilter.addEventListener('change', e => {
   state.time = e.target.value;
+  toggleFilters(false);
   render();
 });
 
 els.scoreFilter.addEventListener('change', e => {
   state.score = Number(e.target.value);
+  toggleFilters(false);
   render();
 });
 
 els.sortFilter.addEventListener('change', e => {
   state.sort = e.target.value;
+  toggleFilters(false);
   render();
 });
 
@@ -1039,7 +1043,7 @@ els.sortFilter.addEventListener('change', e => {
   toggleFilters();
 });
 
-els.applyFiltersBtn.addEventListener('click', () => {
+els.closeFiltersBtn.addEventListener('click', () => {
   toggleFilters(false);
 });
 
