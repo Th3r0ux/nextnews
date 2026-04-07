@@ -913,7 +913,8 @@ function renderActiveFilters(){
         els.detailPane.innerHTML = `<h3>Aucun sujet</h3><p class="lead">Essaie d'élargir les filtres pour revoir des résultats.</p>`;
       }
     }
-
+    
+function getScoreColor(score) {
     const s = Math.max(0, Math.min(100, score));
 
   // 0–49 → gris
