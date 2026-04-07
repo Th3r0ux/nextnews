@@ -347,6 +347,69 @@
       background:#fff;
     }
 
+    .all-topics-section{
+      margin-top:24px;
+    }
+
+    .all-topics-card{
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:22px;
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+
+    .all-topics-row{
+      display:grid;
+      grid-template-columns:minmax(0,1.2fr) minmax(0,1fr) 110px;
+      gap:16px;
+      align-items:center;
+      padding:14px 16px;
+      border-top:1px solid var(--line);
+    }
+
+    .all-topics-head{
+      border-top:none;
+      background:#f8fafc;
+      font-size:12px;
+      font-weight:800;
+      text-transform:uppercase;
+      letter-spacing:.05em;
+      color:#6b7280;
+    }
+
+    .all-topic-item{
+      cursor:pointer;
+      transition:background .15s ease;
+    }
+
+    .all-topic-item:hover{
+      background:#fafafa;
+    }
+
+    .all-topic-item.active{
+      background:#eff6ff;
+    }
+
+    .topic-name{
+      font-size:15px;
+      font-weight:700;
+      line-height:1.35;
+    }
+
+    .topic-subscores{
+      color:#4b5563;
+      font-size:13px;
+      line-height:1.5;
+    }
+
+    .topic-total{
+      justify-self:end;
+      font-size:22px;
+      font-weight:800;
+      color:#1d4ed8;
+    }
+
     @media (max-width: 1100px){
       .layout{grid-template-columns:1fr}
       .side{position:static}
@@ -358,6 +421,8 @@
       .mini-grid{grid-template-columns:repeat(2, minmax(0,1fr))}
       .card-top{align-items:flex-start}
       .score{font-size:20px; min-width:64px}
+      .all-topics-row{grid-template-columns:1fr; gap:8px}
+      .topic-total{justify-self:start}
     }
   </style>
 </head>
@@ -414,6 +479,21 @@
         <p class="lead">Le panneau détail affichera ici le résumé éditorial, le détail du score, les signaux regroupés et les angles proposés.</p>
       </aside>
     </div>
+
+    <section class="all-topics-section">
+      <div class="section-head" style="margin-top:22px;">
+        <h2>Tous les sujets</h2>
+        <span>Vue compacte type Feedly</span>
+      </div>
+      <div class="all-topics-card">
+        <div class="all-topics-head all-topics-row">
+          <div>Sujet</div>
+          <div>Sous-scores</div>
+          <div>Total</div>
+        </div>
+        <div id="allTopicsList"></div>
+      </div>
+    </section>
   </div>
 
   <script>
@@ -548,6 +628,7 @@
       sections: document.getElementById('sections'),
       detailPane: document.getElementById('detailPane'),
       resultsMeta: document.getElementById('resultsMeta'),
+      allTopicsList: document.getElementById('allTopicsList'),
       searchInput: document.getElementById('searchInput'),
       regionFilter: document.getElementById('regionFilter'),
       timeFilter: document.getElementById('timeFilter'),
@@ -620,7 +701,11 @@
         `;
       }).join('');
 
-      document.querySelectorAll('.card').forEach(card => {
+      els.allTopicsList.innerHTML = list.length
+        ? list.map(renderAllTopicsRow).join('')
+        : `<div class="all-topics-row"><div class="empty" style="margin:0;">Aucun sujet avec les filtres actuels.</div></div>`;
+
+      document.querySelectorAll('.card, .all-topic-item').forEach(card => {
         card.addEventListener('click', () => {
           state.selectedId = Number(card.dataset.id);
           render();
@@ -665,6 +750,18 @@
             <button class="btn" type="button">Ignorer</button>
           </div>
         </article>
+      `;
+    }
+
+    function renderAllTopicsRow(item){
+      return `
+        <div class="all-topics-row all-topic-item ${state.selectedId === item.id ? 'active' : ''}" data-id="${item.id}">
+          <div class="topic-name">${item.title}</div>
+          <div class="topic-subscores">
+            Impact ${item.impact} · Utilité ${item.utility} · Réactif ${item.react} · Portée ${item.reach} · Proximité ${item.proximity} · Viralité ${item.virality} · Originalité ${item.originality}
+          </div>
+          <div class="topic-total">${item.total}</div>
+        </div>
       `;
     }
 
