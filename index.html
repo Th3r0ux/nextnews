@@ -914,6 +914,28 @@ function renderActiveFilters(){
       }
     }
 
+    const s = Math.max(0, Math.min(100, score));
+
+  // 0–49 → gris
+  if (s < 50) {
+    const t = s / 49;
+    const light = 92 - t * 50; // 92% → 42%
+    return `hsl(0, 0%, ${light}%)`;
+  }
+
+  // 50–74 → vert → jaune
+  if (s < 75) {
+    const t = (s - 50) / 24;
+    const hue = 120 - (t * 60); // 120 (vert) → 60 (jaune)
+    return `hsl(${hue}, 70%, 55%)`;
+  }
+
+  // 75–100 → jaune → rouge
+  const t = (s - 75) / 25;
+  const hue = 60 - (t * 60); // 60 (jaune) → 0 (rouge)
+  return `hsl(${hue}, 75%, 55%)`;
+}
+
     function renderCard(item){
       return `
         <article class="card ${state.selectedId === item.id ? 'active' : ''}" data-id="${item.id}">
@@ -922,7 +944,9 @@ function renderActiveFilters(){
               <h3 class="card-title">${item.title}</h3>
               <div class="subline">${item.signalsCount} signaux · ${item.sources.slice(0,2).join(' + ')} · il y a ${item.freshnessHours} h</div>
             </div>
-            <div class="score">${item.total}</div>
+            <div class="score" style="background:${getScoreColor(item.total)}; color:#111;">
+  ${item.total}
+</div>
           </div>
           <div class="badges">
             ${scoreBadges(item).map(([label, cls]) => `<span class="badge ${cls}">${label}</span>`).join('')}
@@ -951,7 +975,9 @@ function renderActiveFilters(){
           <div class="topic-subscores">
             Impact ${item.impact} · Utilité ${item.utility} · Réactif ${item.react} · Portée ${item.reach} · Proximité ${item.proximity} · Viralité ${item.virality} · Originalité ${item.originality}
           </div>
-          <div class="topic-total">${item.total}</div>
+          <div class="topic-total" style="color:${getScoreColor(item.total)};">
+  ${item.total}
+</div>
         </div>
       `;
     }
@@ -966,7 +992,9 @@ function renderActiveFilters(){
         <h3>${item.title}</h3>
         <p class="lead">${item.summary}</p>
         <div class="badges">
-          <span class="badge b-blue">Score ${item.total}/100</span>
+          <span class="badge" style="background:${getScoreColor(item.total)}; color:#111;">
+  Score ${item.total}/100
+</span>
           <span class="badge">${item.status}</span>
           <span class="badge">${item.region}</span>
           ${warnings.map(w => `<span class="badge b-orange">${w}</span>`).join('')}
