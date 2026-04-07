@@ -72,10 +72,89 @@
     }
 
     .controls{
-      display:grid;
-      grid-template-columns:minmax(220px,1.2fr) repeat(4, minmax(120px, 0.35fr));
-      gap:10px;
-    }
+  display:grid;
+  gap:10px;
+}
+
+.search-row{
+  display:grid;
+  grid-template-columns:minmax(260px,1fr) auto;
+  gap:10px;
+  align-items:center;
+}
+
+.filter-toggle-btn{
+  border:1px solid var(--line);
+  background:#fff;
+  border-radius:14px;
+  padding:12px 16px;
+  font:inherit;
+  font-weight:700;
+  color:var(--text);
+  box-shadow:var(--shadow);
+  cursor:pointer;
+  white-space:nowrap;
+}
+
+.filter-toggle-btn:hover{
+  border-color:#d1d5db;
+}
+
+.filters-panel{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:14px;
+  box-shadow:var(--shadow);
+}
+
+.filters-panel.hidden{
+  display:none;
+}
+
+.filters-grid{
+  display:grid;
+  grid-template-columns:repeat(4, minmax(0,1fr));
+  gap:10px;
+}
+
+.filters-actions{
+  display:flex;
+  justify-content:flex-end;
+  gap:8px;
+  margin-top:12px;
+}
+
+.active-filters{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+}
+
+.filter-pill{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:8px 12px;
+  border-radius:999px;
+  background:#fff;
+  border:1px solid var(--line);
+  font-size:13px;
+  font-weight:700;
+  color:#374151;
+  box-shadow:var(--shadow);
+}
+
+.filter-pill button{
+  border:none;
+  background:transparent;
+  padding:0;
+  margin:0;
+  cursor:pointer;
+  font:inherit;
+  font-weight:800;
+  color:#6b7280;
+}
 
     .control, .search{
       width:100%;
@@ -415,15 +494,16 @@
       .side{position:static}
     }
 
-    @media (max-width: 860px){
-      .topbar-inner,
-      .controls{grid-template-columns:1fr}
-      .mini-grid{grid-template-columns:repeat(2, minmax(0,1fr))}
-      .card-top{align-items:flex-start}
-      .score{font-size:20px; min-width:64px}
-      .all-topics-row{grid-template-columns:1fr; gap:8px}
-      .topic-total{justify-self:start}
-    }
+   @media (max-width: 860px){
+  .topbar-inner{grid-template-columns:1fr}
+  .search-row{grid-template-columns:1fr}
+  .filters-grid{grid-template-columns:1fr}
+  .mini-grid{grid-template-columns:repeat(2, minmax(0,1fr))}
+  .card-top{align-items:flex-start}
+  .score{font-size:20px; min-width:64px}
+  .all-topics-row{grid-template-columns:1fr; gap:8px}
+  .topic-total{justify-self:start}
+} 
   </style>
 </head>
 <body>
@@ -434,35 +514,56 @@
         <small>Radar éditorial</small>
       </div>
       <div class="controls">
-        <input id="searchInput" class="search" type="search" placeholder="Recherche par sujet, lieu, thème, source..." />
-        <select id="regionFilter" class="control">
-          <option value="all">Toutes les régions</option>
-          <option value="Québec">Québec</option>
-          <option value="Ville">Ville</option>
-          <option value="Canada">Canada</option>
-          <option value="International">International</option>
-        </select>
-        <select id="timeFilter" class="control">
-          <option value="all">Toutes fenêtres</option>
-          <option value="1">Dernière heure</option>
-          <option value="3">3 h</option>
-          <option value="12">12 h</option>
-          <option value="24" selected>24 h</option>
-        </select>
-        <select id="scoreFilter" class="control">
-          <option value="0">Score 0+</option>
-          <option value="50">Score 50+</option>
-          <option value="60" selected>Score 60+</option>
-          <option value="70">Score 70+</option>
-          <option value="80">Score 80+</option>
-        </select>
-        <select id="sortFilter" class="control">
-          <option value="score" selected>Tri: force journalistique</option>
-          <option value="freshness">Tri: plus récent</option>
-          <option value="virality">Tri: plus viral</option>
-          <option value="originality">Tri: plus original</option>
-        </select>
-      </div>
+  <div class="search-row">
+    <input id="searchInput" class="search" type="search" placeholder="Recherche par sujet, lieu, thème, source..." />
+
+    <button id="toggleFiltersBtn" class="filter-toggle-btn" type="button" aria-expanded="false">
+      Filtres
+    </button>
+  </div>
+
+  <div id="activeFilters" class="active-filters"></div>
+
+  <div id="filtersPanel" class="filters-panel hidden">
+    <div class="filters-grid">
+      <select id="regionFilter" class="control">
+        <option value="all">Toutes les régions</option>
+        <option value="Québec">Québec</option>
+        <option value="Ville">Ville</option>
+        <option value="Canada">Canada</option>
+        <option value="International">International</option>
+      </select>
+
+      <select id="timeFilter" class="control">
+        <option value="all">Toutes fenêtres</option>
+        <option value="1">Dernière heure</option>
+        <option value="3">3 h</option>
+        <option value="12">12 h</option>
+        <option value="24" selected>24 h</option>
+      </select>
+
+      <select id="scoreFilter" class="control">
+        <option value="0">Score 0+</option>
+        <option value="50">Score 50+</option>
+        <option value="60" selected>Score 60+</option>
+        <option value="70">Score 70+</option>
+        <option value="80">Score 80+</option>
+      </select>
+
+      <select id="sortFilter" class="control">
+        <option value="score" selected>Tri: force journalistique</option>
+        <option value="freshness">Tri: plus récent</option>
+        <option value="virality">Tri: plus viral</option>
+        <option value="originality">Tri: plus original</option>
+      </select>
+    </div>
+
+    <div class="filters-actions">
+      <button id="resetFiltersBtn" class="btn" type="button">Réinitialiser</button>
+      <button id="closeFiltersBtn" class="btn" type="button">Fermer</button>
+    </div>
+  </div>
+</div>
     </div>
   </div>
 
@@ -625,16 +726,21 @@
     };
 
     const els = {
-      sections: document.getElementById('sections'),
-      detailPane: document.getElementById('detailPane'),
-      resultsMeta: document.getElementById('resultsMeta'),
-      allTopicsList: document.getElementById('allTopicsList'),
-      searchInput: document.getElementById('searchInput'),
-      regionFilter: document.getElementById('regionFilter'),
-      timeFilter: document.getElementById('timeFilter'),
-      scoreFilter: document.getElementById('scoreFilter'),
-      sortFilter: document.getElementById('sortFilter')
-    };
+  sections: document.getElementById('sections'),
+  detailPane: document.getElementById('detailPane'),
+  resultsMeta: document.getElementById('resultsMeta'),
+  allTopicsList: document.getElementById('allTopicsList'),
+  searchInput: document.getElementById('searchInput'),
+  regionFilter: document.getElementById('regionFilter'),
+  timeFilter: document.getElementById('timeFilter'),
+  scoreFilter: document.getElementById('scoreFilter'),
+  sortFilter: document.getElementById('sortFilter'),
+  filtersPanel: document.getElementById('filtersPanel'),
+  toggleFiltersBtn: document.getElementById('toggleFiltersBtn'),
+  closeFiltersBtn: document.getElementById('closeFiltersBtn'),
+  resetFiltersBtn: document.getElementById('resetFiltersBtn'),
+  activeFilters: document.getElementById('activeFilters')
+};
 
     function scoreBadges(item){
       const badges = [];
@@ -676,8 +782,93 @@
       }));
     }
 
+    function toggleFilters(force){
+const isClosed = els.filtersPanel.classList.contains('hidden');
+const shouldOpen = typeof force === 'boolean' ? force : isClosed;
+
+  els.filtersPanel.classList.toggle('hidden', !shouldOpen);
+  els.toggleFiltersBtn.setAttribute('aria-expanded', shouldOpen ? 'true' : 'false');
+}
+
+function resetFilters(){
+  state.region = 'all';
+  state.time = '24';
+  state.score = 60;
+  state.sort = 'score';
+
+  els.regionFilter.value = state.region;
+  els.timeFilter.value = state.time;
+  els.scoreFilter.value = String(state.score);
+  els.sortFilter.value = state.sort;
+
+  toggleFilters(false); // 👈 ajoute ça
+
+  render();
+}
+
+function renderActiveFilters(){
+  const pills = [];
+
+  if (state.region !== 'all') {
+    pills.push({ label: `Région: ${state.region}`, key: 'region' });
+  }
+  if (state.time !== 'all') {
+    const timeLabelMap = {
+      '1': 'Dernière heure',
+      '3': '3 h',
+      '12': '12 h',
+      '24': '24 h'
+    };
+    pills.push({ label: `Fenêtre: ${timeLabelMap[state.time]}`, key: 'time' });
+  }
+  if (state.score !== 60) {
+    pills.push({ label: `Score: ${state.score}+`, key: 'score' });
+  }
+  if (state.sort !== 'score') {
+    const sortLabelMap = {
+      freshness: 'Plus récent',
+      virality: 'Plus viral',
+      originality: 'Plus original'
+    };
+    pills.push({ label: `Tri: ${sortLabelMap[state.sort]}`, key: 'sort' });
+  }
+
+  els.activeFilters.innerHTML = pills.map(pill => `
+    <span class="filter-pill">
+      ${pill.label}
+      <button type="button" data-clear="${pill.key}">×</button>
+    </span>
+  `).join('');
+
+  els.activeFilters.querySelectorAll('[data-clear]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const key = btn.dataset.clear;
+
+      if (key === 'region') {
+        state.region = 'all';
+        els.regionFilter.value = 'all';
+      }
+      if (key === 'time') {
+        state.time = '24';
+        els.timeFilter.value = '24';
+      }
+      if (key === 'score') {
+        state.score = 60;
+        els.scoreFilter.value = '60';
+      }
+      if (key === 'sort') {
+        state.sort = 'score';
+        els.sortFilter.value = 'score';
+      }
+
+      render();
+    });
+  });
+}
+    
     function render(){
       const list = filteredItems();
+      renderActiveFilters();
       els.resultsMeta.textContent = `${list.length} sujet${list.length > 1 ? 's' : ''} visible${list.length > 1 ? 's' : ''}`;
 
       const grouped = {
@@ -824,22 +1015,41 @@
       state.search = e.target.value;
       render();
     });
-    els.regionFilter.addEventListener('change', e => {
-      state.region = e.target.value;
-      render();
-    });
-    els.timeFilter.addEventListener('change', e => {
-      state.time = e.target.value;
-      render();
-    });
-    els.scoreFilter.addEventListener('change', e => {
-      state.score = Number(e.target.value);
-      render();
-    });
-    els.sortFilter.addEventListener('change', e => {
-      state.sort = e.target.value;
-      render();
-    });
+   els.regionFilter.addEventListener('change', e => {
+  state.region = e.target.value;
+  toggleFilters(false);
+  render();
+});
+
+els.timeFilter.addEventListener('change', e => {
+  state.time = e.target.value;
+  toggleFilters(false);
+  render();
+});
+
+els.scoreFilter.addEventListener('change', e => {
+  state.score = Number(e.target.value);
+  toggleFilters(false);
+  render();
+});
+
+els.sortFilter.addEventListener('change', e => {
+  state.sort = e.target.value;
+  toggleFilters(false);
+  render();
+});
+
+    els.toggleFiltersBtn.addEventListener('click', () => {
+  toggleFilters();
+});
+
+els.closeFiltersBtn.addEventListener('click', () => {
+  toggleFilters(false);
+});
+
+els.resetFiltersBtn.addEventListener('click', () => {
+  resetFilters();
+});
 
     render();
   </script>
