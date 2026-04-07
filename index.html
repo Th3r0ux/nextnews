@@ -1,7 +1,750 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>nextnews</title>
+  <style>
+    :root{
+      --bg:#f3f4f6;
+      --card:#ffffff;
+      --muted:#6b7280;
+      --text:#111827;
+      --line:#e5e7eb;
+      --blue:#2563eb;
+      --green:#059669;
+      --orange:#ea580c;
+      --red:#dc2626;
+      --purple:#7c3aed;
+      --shadow:0 8px 24px rgba(15,23,42,0.06);
+      --radius:18px;
+    }
 
-<title>NextNews</title>
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+      background:var(--bg);
+      color:var(--text);
+    }
+
+    .wrap{
+      max-width:1400px;
+      margin:0 auto;
+      padding:20px;
+    }
+
+    .topbar{
+      position:sticky;
+      top:0;
+      z-index:20;
+      backdrop-filter:blur(10px);
+      background:rgba(243,244,246,0.88);
+      border-bottom:1px solid rgba(229,231,235,0.9);
+    }
+
+    .topbar-inner{
+      max-width:1400px;
+      margin:0 auto;
+      padding:16px 20px;
+      display:grid;
+      grid-template-columns:220px 1fr;
+      gap:16px;
+      align-items:center;
+    }
+
+    .brand{
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+    }
+
+    .brand h1{
+      margin:0;
+      font-size:28px;
+      line-height:1;
+      letter-spacing:-0.03em;
+    }
+
+    .brand small{
+      color:var(--muted);
+      font-weight:600;
+    }
+
+    .controls{
+      display:grid;
+      grid-template-columns:minmax(220px,1.2fr) repeat(4, minmax(120px, 0.35fr));
+      gap:10px;
+    }
+
+    .control, .search{
+      width:100%;
+      border:1px solid var(--line);
+      background:#fff;
+      border-radius:14px;
+      padding:12px 14px;
+      font:inherit;
+      color:var(--text);
+      box-shadow:var(--shadow);
+    }
+
+    .meta{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      margin:18px 0 14px;
+      color:var(--muted);
+      font-size:14px;
+    }
+
+    .layout{
+      display:grid;
+      grid-template-columns:minmax(0, 1fr) 380px;
+      gap:18px;
+      align-items:start;
+    }
+
+    .sections{
+      display:grid;
+      gap:18px;
+    }
+
+    .section{
+      background:transparent;
+    }
+
+    .section-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      margin-bottom:10px;
+      gap:10px;
+    }
+
+    .section-head h2{
+      margin:0;
+      font-size:18px;
+      letter-spacing:-0.02em;
+    }
+
+    .section-head span{
+      color:var(--muted);
+      font-size:13px;
+      font-weight:600;
+    }
+
+    .cards{
+      display:grid;
+      gap:12px;
+    }
+
+    .card{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      padding:16px;
+      box-shadow:var(--shadow);
+      cursor:pointer;
+      transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+    }
+
+    .card:hover{
+      transform:translateY(-1px);
+      border-color:#d1d5db;
+    }
+
+    .card.active{
+      border-color:#bfdbfe;
+      box-shadow:0 10px 24px rgba(37,99,235,0.10);
+    }
+
+    .card-top{
+      display:flex;
+      gap:12px;
+      justify-content:space-between;
+      align-items:flex-start;
+      margin-bottom:10px;
+    }
+
+    .card-title{
+      margin:0;
+      font-size:20px;
+      line-height:1.15;
+      letter-spacing:-0.02em;
+    }
+
+    .score{
+      min-width:72px;
+      text-align:center;
+      padding:10px 10px;
+      border-radius:14px;
+      font-weight:800;
+      font-size:24px;
+      background:#eff6ff;
+      color:#1d4ed8;
+      flex-shrink:0;
+    }
+
+    .badges{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin-bottom:10px;
+    }
+
+    .badge{
+      border-radius:999px;
+      padding:6px 10px;
+      font-size:12px;
+      font-weight:700;
+      background:#f3f4f6;
+      color:#374151;
+    }
+
+    .b-blue{background:#dbeafe;color:#1d4ed8}
+    .b-green{background:#d1fae5;color:#047857}
+    .b-orange{background:#ffedd5;color:#c2410c}
+    .b-red{background:#fee2e2;color:#b91c1c}
+    .b-purple{background:#ede9fe;color:#6d28d9}
+
+    .mini-grid{
+      display:grid;
+      grid-template-columns:repeat(4, minmax(0,1fr));
+      gap:8px;
+      margin-bottom:10px;
+    }
+
+    .mini{
+      border:1px solid var(--line);
+      background:#fafafa;
+      border-radius:12px;
+      padding:8px 10px;
+    }
+
+    .mini label{
+      display:block;
+      color:var(--muted);
+      font-size:11px;
+      font-weight:700;
+      text-transform:uppercase;
+      letter-spacing:.04em;
+      margin-bottom:4px;
+    }
+
+    .mini strong{
+      font-size:17px;
+    }
+
+    .subline{
+      color:var(--muted);
+      font-size:14px;
+      margin-bottom:10px;
+    }
+
+    .angle{
+      border-left:4px solid #c7d2fe;
+      background:#f8fafc;
+      border-radius:10px;
+      padding:10px 12px;
+      font-size:14px;
+      line-height:1.4;
+    }
+
+    .actions{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin-top:12px;
+    }
+
+    .btn{
+      border:1px solid var(--line);
+      background:#fff;
+      border-radius:12px;
+      padding:9px 12px;
+      font:inherit;
+      font-size:13px;
+      font-weight:700;
+      color:#374151;
+    }
+
+    .side{
+      position:sticky;
+      top:102px;
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:22px;
+      box-shadow:var(--shadow);
+      padding:18px;
+    }
+
+    .side h3{
+      margin:0 0 8px;
+      font-size:24px;
+      line-height:1.1;
+      letter-spacing:-0.03em;
+    }
+
+    .side .lead{
+      color:var(--muted);
+      line-height:1.5;
+      margin:0 0 16px;
+    }
+
+    .panel{
+      border-top:1px solid var(--line);
+      padding-top:14px;
+      margin-top:14px;
+    }
+
+    .panel h4{
+      margin:0 0 10px;
+      font-size:14px;
+      text-transform:uppercase;
+      letter-spacing:.05em;
+      color:#374151;
+    }
+
+    .score-list, .signal-list, .angles-list{
+      display:grid;
+      gap:8px;
+    }
+
+    .row{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      align-items:flex-start;
+      font-size:14px;
+    }
+
+    .row span:last-child,
+    .signal-meta{
+      color:var(--muted);
+    }
+
+    .signal-item,
+    .angle-item{
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:10px 12px;
+      background:#fafafa;
+    }
+
+    .signal-item strong,
+    .angle-item strong{
+      display:block;
+      margin-bottom:4px;
+    }
+
+    .empty{
+      color:var(--muted);
+      font-size:14px;
+      padding:12px;
+      border:1px dashed var(--line);
+      border-radius:14px;
+      background:#fff;
+    }
+
+    @media (max-width: 1100px){
+      .layout{grid-template-columns:1fr}
+      .side{position:static}
+    }
+
+    @media (max-width: 860px){
+      .topbar-inner,
+      .controls{grid-template-columns:1fr}
+      .mini-grid{grid-template-columns:repeat(2, minmax(0,1fr))}
+      .card-top{align-items:flex-start}
+      .score{font-size:20px; min-width:64px}
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <h1>nextnews</h1>
+        <small>Radar éditorial</small>
+      </div>
+      <div class="controls">
+        <input id="searchInput" class="search" type="search" placeholder="Recherche par sujet, lieu, thème, source..." />
+        <select id="regionFilter" class="control">
+          <option value="all">Toutes régions</option>
+          <option value="Québec">Québec</option>
+          <option value="Ville">Ville</option>
+          <option value="Canada">Canada</option>
+          <option value="International">International</option>
+        </select>
+        <select id="timeFilter" class="control">
+          <option value="all">Toutes fenêtres</option>
+          <option value="1">1 h</option>
+          <option value="3">3 h</option>
+          <option value="12">12 h</option>
+          <option value="24" selected>24 h</option>
+        </select>
+        <select id="scoreFilter" class="control">
+          <option value="0">Score 0+</option>
+          <option value="50">Score 50+</option>
+          <option value="60" selected>Score 60+</option>
+          <option value="70">Score 70+</option>
+          <option value="80">Score 80+</option>
+        </select>
+        <select id="sortFilter" class="control">
+          <option value="score" selected>Tri: force journalistique</option>
+          <option value="freshness">Tri: plus récent</option>
+          <option value="virality">Tri: plus viral</option>
+          <option value="originality">Tri: plus original</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="meta">
+      <div id="resultsMeta">Chargement...</div>
+      <div>Dernière mise à jour: il y a 2 min</div>
+    </div>
+
+    <div class="layout">
+      <div class="sections" id="sections"></div>
+      <aside class="side" id="detailPane">
+        <h3>Sélectionne un sujet</h3>
+        <p class="lead">Le panneau détail affichera ici le résumé éditorial, le détail du score, les signaux regroupés et les angles proposés.</p>
+      </aside>
+    </div>
+  </div>
+
+  <script>
+    const items = [
+      {
+        id: 1,
+        zone: "priorites",
+        title: "Hausse des loyers au Québec",
+        summary: "Le sujet monte parce qu'il touche directement une très grande part de la population et ouvre un angle de service immédiat.",
+        region: "Québec",
+        freshnessHours: 2,
+        status: "À traiter",
+        sources: ["La Presse", "Radio-Canada", "Google Trends"],
+        signalsCount: 12,
+        impact: 22,
+        utility: 21,
+        react: 11,
+        reach: 13,
+        proximity: 3,
+        virality: 4,
+        originality: 4,
+        angleMain: "Combien votre loyer pourrait augmenter selon votre ville.",
+        angles: [
+          { type: "Service", text: "Combien votre loyer pourrait augmenter selon votre ville." },
+          { type: "Réaction", text: "Pourquoi le sujet remonte fortement aujourd'hui." },
+          { type: "Original", text: "Les régions où la pression semble la plus forte." }
+        ],
+        signals: [
+          { title: "Nouvelle hausse pressentie dans plusieurs marchés", meta: "La Presse · article · il y a 2 h" },
+          { title: "Forte montée des recherches liées aux loyers", meta: "Google Trends · tendance · il y a 1 h" }
+        ]
+      },
+      {
+        id: 2,
+        zone: "decouvrir",
+        title: "Grève possible du transport à Montréal",
+        summary: "Signal encore en consolidation, mais fort potentiel réactif local si le mouvement se confirme.",
+        region: "Ville",
+        freshnessHours: 1,
+        status: "À surveiller",
+        sources: ["Social", "Médias locaux"],
+        signalsCount: 7,
+        impact: 18,
+        utility: 14,
+        react: 16,
+        reach: 10,
+        proximity: 5,
+        virality: 4,
+        originality: 3,
+        angleMain: "Qui serait touché dès demain matin, ligne par ligne.",
+        angles: [
+          { type: "Service", text: "Qui serait touché dès demain matin, ligne par ligne." },
+          { type: "Réaction", text: "Pourquoi le bruit a monté d'un coup autour de la grève." }
+        ],
+        signals: [
+          { title: "Montée rapide de conversations locales", meta: "Social · partages · il y a 45 min" },
+          { title: "Premier article de cadrage publié", meta: "Média local · article · il y a 1 h" }
+        ]
+      },
+      {
+        id: 3,
+        zone: "angles",
+        title: "Crédit d'impôt pour les familles",
+        summary: "Sujet utile et durable, avec bon potentiel d'explication concrète si on évite l'angle trop institutionnel.",
+        region: "Québec",
+        freshnessHours: 6,
+        status: "À regarder",
+        sources: ["Gouvernement", "Médias", "Recherche"],
+        signalsCount: 5,
+        impact: 19,
+        utility: 22,
+        react: 7,
+        reach: 12,
+        proximity: 3,
+        virality: 2,
+        originality: 4,
+        angleMain: "Ce que la mesure change concrètement pour un parent.",
+        angles: [
+          { type: "Service", text: "Ce que la mesure change concrètement pour un parent." },
+          { type: "Original", text: "Les familles qui pourraient moins en bénéficier qu'on le croit." }
+        ],
+        signals: [
+          { title: "Annonce déjà reprise par plusieurs médias", meta: "Médias · articles · il y a 6 h" }
+        ]
+      },
+      {
+        id: 4,
+        zone: "priorites",
+        title: "Allergies saisonnières en forte hausse",
+        summary: "Très bon sujet de service avec impact direct, utile et facilement localisable.",
+        region: "Québec",
+        freshnessHours: 3,
+        status: "Nouveau",
+        sources: ["Google Trends", "Santé", "Météo"],
+        signalsCount: 9,
+        impact: 17,
+        utility: 20,
+        react: 9,
+        reach: 11,
+        proximity: 3,
+        virality: 3,
+        originality: 4,
+        angleMain: "À quel moment la saison des allergies frappe le plus fort selon la région.",
+        angles: [
+          { type: "Service", text: "À quel moment la saison des allergies frappe le plus fort selon la région." }
+        ],
+        signals: [
+          { title: "Recherches en hausse sur les symptômes", meta: "Google Trends · tendance · il y a 3 h" }
+        ]
+      }
+    ].map(item => ({
+      ...item,
+      total: item.impact + item.utility + item.react + item.reach + item.proximity + item.virality + item.originality
+    }));
+
+    const sections = {
+      decouvrir: { title: "À découvrir", hint: "Signaux émergents et sujets en montée" },
+      priorites: { title: "Priorités", hint: "Les meilleurs potentiels du moment" },
+      angles: { title: "Angles", hint: "Les sujets les plus transformables en contenu" }
+    };
+
+    const state = {
+      search: "",
+      region: "all",
+      time: "24",
+      score: 60,
+      sort: "score",
+      selectedId: null
+    };
+
+    const els = {
+      sections: document.getElementById('sections'),
+      detailPane: document.getElementById('detailPane'),
+      resultsMeta: document.getElementById('resultsMeta'),
+      searchInput: document.getElementById('searchInput'),
+      regionFilter: document.getElementById('regionFilter'),
+      timeFilter: document.getElementById('timeFilter'),
+      scoreFilter: document.getElementById('scoreFilter'),
+      sortFilter: document.getElementById('sortFilter')
+    };
+
+    function scoreBadges(item){
+      const badges = [];
+      if (item.impact >= 21) badges.push(['Impact fort', 'b-red']);
+      if (item.utility >= 16) badges.push(['Très utile', 'b-green']);
+      if (item.react >= 16) badges.push(['Oh shit', 'b-orange']);
+      if (item.virality >= 4) badges.push(['Trending', 'b-blue']);
+      if (item.originality === 5) badges.push(['Exclusif possible', 'b-purple']);
+      badges.push([item.region, '']);
+      return badges;
+    }
+
+    function sortItems(list){
+      const arr = [...list];
+      switch(state.sort){
+        case 'freshness': return arr.sort((a,b) => a.freshnessHours - b.freshnessHours || b.total - a.total);
+        case 'virality': return arr.sort((a,b) => b.virality - a.virality || b.total - a.total);
+        case 'originality': return arr.sort((a,b) => b.originality - a.originality || b.total - a.total);
+        default: return arr.sort((a,b) => b.total - a.total || a.freshnessHours - b.freshnessHours);
+      }
+    }
+
+    function filteredItems(){
+      return sortItems(items.filter(item => {
+        const q = state.search.trim().toLowerCase();
+        const haystack = [
+          item.title,
+          item.summary,
+          item.region,
+          item.sources.join(' '),
+          item.angleMain
+        ].join(' ').toLowerCase();
+
+        if (q && !haystack.includes(q)) return false;
+        if (state.region !== 'all' && item.region !== state.region) return false;
+        if (item.total < state.score) return false;
+        if (state.time !== 'all' && item.freshnessHours > Number(state.time)) return false;
+        return true;
+      }));
+    }
+
+    function render(){
+      const list = filteredItems();
+      els.resultsMeta.textContent = `${list.length} sujet${list.length > 1 ? 's' : ''} visible${list.length > 1 ? 's' : ''}`;
+
+      const grouped = {
+        decouvrir: list.filter(i => i.zone === 'decouvrir'),
+        priorites: list.filter(i => i.zone === 'priorites'),
+        angles: list.filter(i => i.zone === 'angles')
+      };
+
+      els.sections.innerHTML = Object.entries(sections).map(([key, meta]) => {
+        const cards = grouped[key];
+        return `
+          <section class="section">
+            <div class="section-head">
+              <h2>${meta.title}</h2>
+              <span>${meta.hint}</span>
+            </div>
+            <div class="cards">
+              ${cards.length ? cards.map(renderCard).join('') : `<div class="empty">Aucun sujet dans cette section avec les filtres actuels.</div>`}
+            </div>
+          </section>
+        `;
+      }).join('');
+
+      document.querySelectorAll('.card').forEach(card => {
+        card.addEventListener('click', () => {
+          state.selectedId = Number(card.dataset.id);
+          render();
+        });
+      });
+
+      const selected = list.find(i => i.id === state.selectedId) || list[0] || null;
+      if (selected) {
+        state.selectedId = selected.id;
+        renderDetail(selected);
+        const active = document.querySelector(`.card[data-id="${selected.id}"]`);
+        if (active) active.classList.add('active');
+      } else {
+        els.detailPane.innerHTML = `<h3>Aucun sujet</h3><p class="lead">Essaie d'élargir les filtres pour revoir des résultats.</p>`;
+      }
+    }
+
+    function renderCard(item){
+      return `
+        <article class="card ${state.selectedId === item.id ? 'active' : ''}" data-id="${item.id}">
+          <div class="card-top">
+            <div>
+              <h3 class="card-title">${item.title}</h3>
+              <div class="subline">${item.signalsCount} signaux · ${item.sources.slice(0,2).join(' + ')} · il y a ${item.freshnessHours} h</div>
+            </div>
+            <div class="score">${item.total}</div>
+          </div>
+          <div class="badges">
+            ${scoreBadges(item).map(([label, cls]) => `<span class="badge ${cls}">${label}</span>`).join('')}
+            <span class="badge">${item.status}</span>
+          </div>
+          <div class="mini-grid">
+            <div class="mini"><label>Impact</label><strong>${item.impact}</strong></div>
+            <div class="mini"><label>Utilité</label><strong>${item.utility}</strong></div>
+            <div class="mini"><label>Réactif</label><strong>${item.react}</strong></div>
+            <div class="mini"><label>Originalité</label><strong>${item.originality}</strong></div>
+          </div>
+          <div class="angle"><strong>Angle :</strong> ${item.angleMain}</div>
+          <div class="actions">
+            <button class="btn" type="button">Ouvrir</button>
+            <button class="btn" type="button">Assigner</button>
+            <button class="btn" type="button">Ignorer</button>
+          </div>
+        </article>
+      `;
+    }
+
+    function renderDetail(item){
+      const warnings = [];
+      if (item.impact < 13) warnings.push('Impact sous le minimum');
+      if (item.utility < 6) warnings.push('Utilité sous le minimum');
+      if (item.react < 5) warnings.push('Réactif sous le minimum');
+
+      els.detailPane.innerHTML = `
+        <h3>${item.title}</h3>
+        <p class="lead">${item.summary}</p>
+        <div class="badges">
+          <span class="badge b-blue">Score ${item.total}/100</span>
+          <span class="badge">${item.status}</span>
+          <span class="badge">${item.region}</span>
+          ${warnings.map(w => `<span class="badge b-orange">${w}</span>`).join('')}
+        </div>
+
+        <div class="panel">
+          <h4>Détail du score</h4>
+          <div class="score-list">
+            <div class="row"><span>Impact sur les gens</span><strong>${item.impact}/25</strong></div>
+            <div class="row"><span>Potentiel d'utilité</span><strong>${item.utility}/25</strong></div>
+            <div class="row"><span>Potentiel réactif</span><strong>${item.react}/20</strong></div>
+            <div class="row"><span>Portée</span><strong>${item.reach}/15</strong></div>
+            <div class="row"><span>Proximité</span><strong>${item.proximity}/5</strong></div>
+            <div class="row"><span>Viralité</span><strong>${item.virality}/5</strong></div>
+            <div class="row"><span>Originalité</span><strong>${item.originality}/5</strong></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h4>Signaux regroupés</h4>
+          <div class="signal-list">
+            ${item.signals.map(sig => `
+              <div class="signal-item">
+                <strong>${sig.title}</strong>
+                <div class="signal-meta">${sig.meta}</div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+
+        <div class="panel">
+          <h4>Angles proposés</h4>
+          <div class="angles-list">
+            ${item.angles.map(angle => `
+              <div class="angle-item">
+                <strong>${angle.type}</strong>
+                <div>${angle.text}</div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    els.searchInput.addEventListener('input', e => {
+      state.search = e.target.value;
+      render();
+    });
+    els.regionFilter.addEventListener('change', e => {
+      state.region = e.target.value;
+      render();
+    });
+    els.timeFilter.addEventListener('change', e => {
+      state.time = e.target.value;
+      render();
+    });
+    els.scoreFilter.addEventListener('change', e => {
+      state.score = Number(e.target.value);
+      render();
+    });
+    els.sortFilter.addEventListener('change', e => {
+      state.sort = e.target.value;
+      render();
+    });
+
+    render();
+  </script>
+</body>
+</html>
