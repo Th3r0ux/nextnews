@@ -972,6 +972,7 @@ function getScoreColor(score) {
             <button class="btn" type="button">Ouvrir</button>
             <button class="btn" type="button">Assigner</button>
             <button class="btn" type="button">Ignorer</button>
+            <button class="btn" type="button">Générer un synopsis</button>
           </div>
         </article>
       `;
@@ -1014,6 +1015,10 @@ Originalité ${toPercent(item.originality, 5)}%
           <span class="badge">${item.region}</span>
           ${warnings.map(w => `<span class="badge b-orange">${w}</span>`).join('')}
         </div>
+
+     <div class="actions" style="margin-top:0; margin-bottom:14px;">
+  <button class="btn" type="button">Générer un synopsis</button>
+</div>   
 
 <div class="panel">
   <h4>Qu’est-ce qui se passe ?</h4>
