@@ -1015,6 +1015,13 @@ Originalité ${toPercent(item.originality, 5)}%
           ${warnings.map(w => `<span class="badge b-orange">${w}</span>`).join('')}
         </div>
 
+<div class="panel">
+  <h4>Qu’est-ce qui se passe ?</h4>
+  <p style="margin:0; line-height:1.6;">
+    ${item.whatIsHappening || "Aucune synthèse disponible pour le moment."}
+  </p>
+</div>
+
         <div class="panel">
           <h4>Détail du score</h4>
           <div class="score-list">
